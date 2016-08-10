@@ -9,8 +9,8 @@ var lr = new LineByLineReader('base.txt');
 // for each month
 // {
 //  1880:
-//    {1: { -179: [-89 - +89],
-//          -177: [-89 - +89],
+//    {1: { -179: [+89 - -89],
+//          -177: [+89 - -89],
 //          ...               }
 //     2:
 //    },
@@ -24,7 +24,7 @@ for (var i = 0; i <= 136; i++) {
   for (var j = 1; j <= 12; j++) {
     var lon = {};
     for (var k = 0; k <= 358; k += 2) {
-      lon[k] = Array.apply(null, Array(90)).map(Number.prototype.valueOf, 0);
+      lon[k] = Array.apply(null, Array(89)).map(Number.prototype.valueOf, 0);
     }
     year_month[j] = lon;
   }
@@ -43,13 +43,16 @@ lr.on('line', function (line) {
   } else if (line.split(',')[0] != 'time_index') {
     //handle data_lines
     var data_arr = line.split(',');
-    var _month = data_arr[0];
+    var _month = data_arr.shift();
+
+    // invert latitute array, because base txt hold it in wring oder
+    data_arr = data_arr.reverse();
 
     var month = (_month % 12) + 1;
     var y = 1880 + Math.floor(_month/12);
 
     for (var i = 0; i < data_arr.length; i++) {
-      data[y][month][longitude][i] = data_arr[i+1] / 100;
+      data[y][month][longitude][i] = data_arr[i] / 100;
     }
   }
 });
